@@ -1,0 +1,62 @@
+#!/bin/bash
+
+set -eu
+export SHELLOPTS
+
+fly set-pipeline \
+  --pipeline docker-bosh-stemcell-importer \
+  --config <(
+    bosh interpolate pipeline.yml \
+      --ops-file <(
+        bosh interpolate stemcell.yml \
+          --var os=ubuntu-trusty \
+          --var version_family=3363.latest
+      ) \
+      --ops-file <(
+        bosh interpolate stemcell.yml \
+          --var os=centos-7 \
+          --var version_family=3363.latest
+      ) \
+      --ops-file <(
+        bosh interpolate stemcell.yml \
+          --var os=ubuntu-trusty \
+          --var version_family=3421.latest
+      ) \
+      --ops-file <(
+        bosh interpolate stemcell.yml \
+          --var os=centos-7 \
+          --var version_family=3421.latest
+      ) \
+      --ops-file <(
+        bosh interpolate stemcell.yml \
+          --var os=ubuntu-trusty \
+          --var version_family=3445.latest
+      ) \
+      --ops-file <(
+        bosh interpolate stemcell.yml \
+          --var os=centos-7 \
+          --var version_family=3445.latest
+      ) \
+      --ops-file <(
+        bosh interpolate stemcell.yml \
+          --var os=ubuntu-trusty \
+          --var version_family=3468.latest
+      ) \
+      --ops-file <(
+        bosh interpolate stemcell.yml \
+          --var os=centos-7 \
+          --var version_family=3468.latest
+      ) \
+      --ops-file <(
+        bosh interpolate stemcell.yml \
+          --var os=ubuntu-trusty \
+          --var version_family=3541.latest
+      ) \
+      --ops-file <(
+        bosh interpolate stemcell.yml \
+          --var os=centos-7 \
+          --var version_family=3541.latest
+      )
+  ) \
+  --load-vars-from <( lpass show --notes --fixed-strings 'dpb587/docker-bosh-stemcell-importer secrets.yml' ) \
+  "$@"

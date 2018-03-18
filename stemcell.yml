@@ -1,0 +1,49 @@
+- path: /groups/name=all/jobs/-
+  type: replace
+  value: ((os))-((version_family))
+- path: /jobs/-
+  type: replace
+  value:
+    name: ((os))-((version_family))
+    serial: true
+    serial_groups:
+    - stemcell
+    plan:
+    - get: stemcell
+      resource: ((os))-((version_family))
+      trigger: true
+    - task: extract
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: ubuntu
+            tag: xenial
+        inputs:
+        - name: stemcell
+        outputs:
+        - name: extracted-stemcell
+        run:
+          path: sh
+          args:
+          - -ec
+          - |
+            echo ((version_family)) > extracted-stemcell/tags
+            tar -Oxzf stemcell/stemcell.tgz image > extracted-stemcell/rootfs
+            tar -Oxzf stemcell/stemcell.tgz stemcell.MF | grep '^version: ' | awk '{ print $2 }' | tr -d "'\"" > extracted-stemcell/version
+    - put: ((os))-docker-image
+      params:
+        additional_tags: extracted-stemcell/tags # ignored?
+        import_file: extracted-stemcell/rootfs
+        import_changes: # todo
+        - ENTRYPOINT /bin/bash
+        tag: extracted-stemcell/version
+- path: /resources/-
+  type: replace
+  value:
+    name: ((os))-((version_family))
+    type: bosh-io-stemcell
+    source:
+      name: bosh-warden-boshlite-((os))-go_agent
+      version_family: ((version_family))

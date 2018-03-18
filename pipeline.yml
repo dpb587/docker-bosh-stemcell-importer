@@ -1,0 +1,17 @@
+groups:
+- name: all
+  jobs: []
+jobs: []
+resources:
+- name: ubuntu-trusty-docker-image
+  type: docker-image
+  source:
+    repository: dpb587/bosh-ubuntu-trusty-stemcell
+    username: ((username))
+    password: ((password))
+- name: centos-7-docker-image
+  type: docker-image
+  source:
+    repository: dpb587/bosh-centos-7-stemcell
+    username: ((username))
+    password: ((password))
